@@ -9,7 +9,7 @@ numberToInt n       = read n
 parse :: String -> [Int]
 parse = map numberToInt . lines
 
-firstDuplicate :: [Int] -> Int
+firstDuplicate :: Ord a => [a] -> a
 firstDuplicate = go S.empty
   where
     go seen (x:xs)
