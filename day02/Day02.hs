@@ -28,7 +28,7 @@ checksum boxes = exactlyTwo * exactlyThree
 areCorrectBoxes :: Box -> Box -> Bool
 areCorrectBoxes (Box x) (Box y) = differByOneChar x y
 
-differByOneChar :: (Eq a) => [a] -> [a] -> Bool
+differByOneChar :: Eq a => [a] -> [a] -> Bool
 differByOneChar (x:xs) (y:ys)
   | x /= y    = xs == ys
   | otherwise = differByOneChar xs ys
@@ -41,18 +41,15 @@ uniquePairs l = do
   y      <- xs
   return (x, y)
 
-commonLetters :: String -> String -> String
-commonLetters (x:xs) (y:ys)
-  | x /= y    =     commonLetters xs ys
-  | otherwise = x : commonLetters xs ys
-commonLetters _ _ = []
+commonLetters :: Eq a => [a] -> [a] -> [a]
+commonLetters xs ys = foldr go [] $ zip xs ys
+  where go (x, y) acc = if x == y then x : acc else acc
 
 commonLettersOfCorrectBoxes :: [Box] -> String
-commonLettersOfCorrectBoxes boxes = go $ uniquePairs boxes
-  where
-    go ((x, y):zs)
-      | areCorrectBoxes x y = commonLetters (getId x) (getId y)
-      | otherwise           = go zs
+commonLettersOfCorrectBoxes boxes = go . uniquePairs $ boxes
+  where go ((x, y):zs)
+          | areCorrectBoxes x y = commonLetters (getId x) (getId y)
+          | otherwise           = go zs
 
 solvePartOne :: [Box] -> Int
 solvePartOne = checksum
