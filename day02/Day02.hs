@@ -1,12 +1,16 @@
+{-# OPTIONS_GHC -Wall #-}
+
 module Day02 where
 
 import Data.List
 
 
-data Box = Box { getId :: String } deriving (Eq)
+data Box = Box
+  { boxId :: String }
+  deriving (Show, Eq)
 
-parse :: String -> [Box]
-parse = map Box . lines
+parseInput :: String -> [Box]
+parseInput = fmap Box . lines
 
 count :: Eq a => [a] -> a -> Int
 count s c = length . filter (==c) $ s
@@ -15,10 +19,10 @@ appearsExactlyKTimes :: Int -> String -> Bool
 appearsExactlyKTimes k s = k `elem` (count s <$> nub s)
 
 appearsExactlyTwoTimes :: Box -> Bool
-appearsExactlyTwoTimes = appearsExactlyKTimes 2 . getId
+appearsExactlyTwoTimes = appearsExactlyKTimes 2 . boxId
 
 appearsExactlyThreeTimes :: Box -> Bool
-appearsExactlyThreeTimes = appearsExactlyKTimes 3 . getId
+appearsExactlyThreeTimes = appearsExactlyKTimes 3 . boxId
 
 checksum :: [Box] -> Int
 checksum boxes = exactlyTwo * exactlyThree
@@ -48,8 +52,9 @@ commonLetters xs ys = foldr go [] $ zip xs ys
 commonLettersOfCorrectBoxes :: [Box] -> String
 commonLettersOfCorrectBoxes boxes = go . uniquePairs $ boxes
   where go ((x, y):zs)
-          | areCorrectBoxes x y = commonLetters (getId x) (getId y)
+          | areCorrectBoxes x y = commonLetters (boxId x) (boxId y)
           | otherwise           = go zs
+        go [] = error "Empty list of boxes"
 
 solvePartOne :: [Box] -> Int
 solvePartOne = checksum
@@ -60,15 +65,15 @@ solvePartTwo = commonLettersOfCorrectBoxes
 main :: IO()
 main = do
   contents <- readFile "input.txt"
-  let boxes = parse contents
+  let boxes = parseInput contents
   putStrLn . show . solvePartOne $ boxes
   putStrLn .        solvePartTwo $ boxes
 
 
-parseTest :: Bool
-parseTest = [ Box "abcdef"
-            , Box "bababc"
-            , Box "aabcdd"] == parse "abcdef\nbababc\naabcdd\n"
+parseInputTest :: Bool
+parseInputTest = [ Box "abcdef"
+                 , Box "bababc"
+                 , Box "aabcdd"] == parseInput "abcdef\nbababc\naabcdd\n"
 
 solvePartOneTest :: Bool
 solvePartOneTest = and
